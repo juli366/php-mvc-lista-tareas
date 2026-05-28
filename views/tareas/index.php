@@ -11,28 +11,28 @@ $cols = [
     <div class="col-3">
         <div class="stat-card p-3 text-center">
             <i class="bi bi-kanban text-primary fs-4"></i>
-            <div class="fw-bold fs-4 mt-1"><?= $conteo['total'] ?></div>
+            <div class="fw-bold fs-4 mt-1" id="stat-total"><?= $conteo['total'] ?></div>
             <div class="text-muted small">Total</div>
         </div>
     </div>
     <div class="col-3">
         <div class="stat-card p-3 text-center">
             <i class="bi bi-circle text-secondary fs-4"></i>
-            <div class="fw-bold fs-4 mt-1"><?= $conteo['pendiente'] ?></div>
+            <div class="fw-bold fs-4 mt-1" id="stat-pendiente"><?= $conteo['pendiente'] ?></div>
             <div class="text-muted small">Pendiente</div>
         </div>
     </div>
     <div class="col-3">
         <div class="stat-card p-3 text-center">
             <i class="bi bi-arrow-repeat text-warning fs-4"></i>
-            <div class="fw-bold fs-4 mt-1"><?= $conteo['en_progreso'] ?></div>
+            <div class="fw-bold fs-4 mt-1" id="stat-en_progreso"><?= $conteo['en_progreso'] ?></div>
             <div class="text-muted small">En Progreso</div>
         </div>
     </div>
     <div class="col-3">
         <div class="stat-card p-3 text-center">
             <i class="bi bi-check-circle text-success fs-4"></i>
-            <div class="fw-bold fs-4 mt-1"><?= $conteo['completada'] ?></div>
+            <div class="fw-bold fs-4 mt-1" id="stat-completada"><?= $conteo['completada'] ?></div>
             <div class="text-muted small">Completada</div>
         </div>
     </div>
@@ -143,8 +143,8 @@ document.querySelectorAll('.kanban-col').forEach(col => {
             const id     = evt.item.dataset.id;
             const estado = evt.to.dataset.estado;
 
-            // Ocultar/mostrar placeholder vacío
             actualizarVacios();
+            actualizarContadores();
 
             fetch('index.php?controller=tareas&action=actualizarEstado', {
                 method: 'POST',
@@ -201,11 +201,22 @@ function actualizarVacios() {
 }
 
 function actualizarContadores() {
+    let total = 0;
     document.querySelectorAll('.kanban-col').forEach(col => {
         const estado = col.dataset.estado;
         const count  = col.querySelectorAll('.kanban-card').length;
-        const badge  = col.closest('.card').querySelector('.badge');
+        total += count;
+
+        // Badge dentro de la columna Kanban
+        const badge = col.closest('.card').querySelector('.badge');
         if (badge) badge.textContent = count;
+
+        // Stat card superior
+        const stat = document.getElementById('stat-' + estado);
+        if (stat) stat.textContent = count;
     });
+
+    // Total superior
+    document.getElementById('stat-total').textContent = total;
 }
 </script>
