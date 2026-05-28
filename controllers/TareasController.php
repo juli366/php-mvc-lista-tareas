@@ -10,29 +10,48 @@ class TareasController {
 
     public function index(): void {
         $pageTitle    = 'Lista de Tareas';
-        $pageSubtitle = 'Organiza y gestiona tus tareas del día';
+        $pageSubtitle = 'Tablero Kanban — arrastra las tarjetas entre columnas';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $accion = $_POST['accion'] ?? '';
-
-            if ($accion === 'crear' && !empty(trim($_POST['titulo'] ?? ''))) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'crear') {
+            if (!empty(trim($_POST['titulo'] ?? ''))) {
                 $this->model->crear($_POST['titulo']);
-            } elseif ($accion === 'toggle' && isset($_POST['id'])) {
-                $this->model->toggleCompletar((int) $_POST['id']);
-            } elseif ($accion === 'eliminar' && isset($_POST['id'])) {
-                $this->model->eliminar((int) $_POST['id']);
             }
-
-            header('Location: index.php' . (isset($_GET['filtro']) ? '?filtro=' . $_GET['filtro'] : ''));
+            header('Location: index.php');
             exit;
         }
 
-        $filtro = $_GET['filtro'] ?? null;
-        $tareas = $this->model->todas($filtro);
-        $conteo = $this->model->conteo();
+        $columnas = $this->model->porEstado();
+        $conteo   = $this->model->conteo();
 
         require_once __DIR__ . '/../views/layout/header.php';
         require_once __DIR__ . '/../views/tareas/index.php';
         require_once __DIR__ . '/../views/layout/footer.php';
+    }
+
+    public function actualizarEstado(): void {
+        header('Content-Type: application/json');
+        $id     = intval($_POST['id']     ?? 0);
+        $estado = trim($_POST['estado']   ?? '');
+        if ($id && $estado) {
+            $this->model->actualizarEstado($id, $estado);
+            echo json_encode(['ok' => true]);
+        } else {
+            http_response_code(400);
+            echo json_encode(['ok' => false]);
+        }
+        exit;
+    }
+
+    public function eliminar(): void {
+        header('Content-Type: application/json');
+        $id = intval($_POST['id'] ?? 0);
+        if ($id) {
+            $this->model->eliminar($id);
+            echo json_encode(['ok' => true]);
+        } else {
+            http_response_code(400);
+            echo json_encode(['ok' => false]);
+        }
+        exit;
     }
 }
