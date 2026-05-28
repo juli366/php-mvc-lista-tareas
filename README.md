@@ -25,8 +25,21 @@ Tablero Kanban para gestionar tareas con tres columnas de estado (Pendiente, En 
 ### PHP 8.x + extensión pdo_sqlite
 
 #### Windows
-1. Descarga [XAMPP](https://www.apachefriends.org/) — incluye PHP y SQLite
-2. Con PHP standalone: descarga desde [windows.php.net](https://windows.php.net/download/) y habilita `extension=pdo_sqlite` en `php.ini`
+
+**Opción A — XAMPP (recomendado):**
+1. Descarga e instala [XAMPP](https://www.apachefriends.org/)
+2. SQLite y `pdo_sqlite` ya vienen habilitados — no se requiere configuración adicional
+
+**Opción B — PHP standalone:**
+1. Descarga el zip de [windows.php.net](https://windows.php.net/download/) (elige *Thread Safe*)
+2. Descomprime y agrega la carpeta al `PATH` del sistema
+3. En la carpeta de PHP, copia `php.ini-development` → `php.ini`
+4. Abre `php.ini` y descomenta estas líneas (quita el `;` inicial):
+   ```ini
+   extension=pdo_sqlite
+   extension=sqlite3
+   ```
+5. Verifica con `php -m | findstr sqlite`
 
 #### Linux (Ubuntu/Debian)
 ```bash
